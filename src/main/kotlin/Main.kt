@@ -4,9 +4,13 @@ import com.tarefasapi.com.tarefasapi.routes.projetosRoutes
 import com.tarefasapi.com.tarefasapi.routes.tarefasRoutes
 import com.tarefasapi.models.Projetos
 import com.tarefasapi.models.Tarefas
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -29,6 +33,12 @@ fun main() {
 
     // Iniciar o servidor Ktor
     embeddedServer(Netty, port = 8080) {
+        install(ContentNegotiation) {
+            json(Json{
+                prettyPrint = true
+                isLenient = true
+            })
+        }
         routing {
             tarefasRoutes()
             projetosRoutes()
