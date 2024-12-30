@@ -17,10 +17,10 @@ object Projetos : Table("projetos") {
 object Tarefas : Table("tarefas") {
     val id = integer("id").autoIncrement()
     val titulo = varchar("titulo", 255)
-    val descricao = varchar("descricao", 255)
+    val descricao = varchar("descricao", 255).nullable()
     val status = varchar("status", 50)
-    val prioridade = varchar("prioridade", 50)
-    val dataDeConclusao = date("data_de_conclusao") // Tipo de data
+    val prioridade = integer("prioridade")
+    val dataDeConclusao = date("data_de_conclusao").nullable()
     val projetoId = integer("projeto_id").references(Projetos.id)
     override val primaryKey = PrimaryKey(id)
 }
