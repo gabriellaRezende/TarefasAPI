@@ -8,8 +8,8 @@ object Projetos : Table("projetos") {
     val id = integer("id").autoIncrement()
     val nome = varchar("nome", 255)
     val descricao = text("descricao").nullable()
-    val dataDeInicio = date("data_de_inicio") // Tipo de data
-    val dataDeFim = date("data_de_fim") // Tipo de data
+    val dataDeInicio = date("data_de_inicio").nullable() // Tipo de data
+    val dataDeFim = date("data_de_fim").nullable() // Tipo de data
     override val primaryKey = PrimaryKey(id)
 }
 
