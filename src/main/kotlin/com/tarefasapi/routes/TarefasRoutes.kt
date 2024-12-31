@@ -1,6 +1,7 @@
 package com.tarefasapi.com.tarefasapi.routes
 
 import com.tarefasapi.com.tarefasapi.models.TarefasDTO
+import com.tarefasapi.models.Projetos
 import com.tarefasapi.models.Tarefas
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -32,18 +33,37 @@ fun Route.tarefasRoutes() {
 
         // Criar uma nova tarefa
         post {
-            val tarefaDTO = call.receive<TarefasDTO>()
-            val tarefaId = transaction {
-                Tarefas.insert {
-                    it[titulo] = tarefaDTO.titulo
-                    it[descricao] = tarefaDTO.descricao
-                    it[prioridade] = tarefaDTO.prioridade
-                    it[status] = tarefaDTO.status
-                    it[dataDeConclusao] = null // Ajuste conforme necessário
-                } get Tarefas.id
+            //Incluir o try cath para ver erros e entender o que esta acontecendo
+            try {
+                val tarefaDTO = call.receive<TarefasDTO>()
+                println("Recebido no POST: ${tarefaDTO}") //Log do DTO recebido
+
+                //Validar se o projeto existe
+                val projetoExiste = transaction {
+                    Projetos.select {Projetos.id eq tarefaDTO.projetoId}.count() > 0
+                }
+                if (projetoExiste) {
+                    call.respond(HttpStatusCode.BadRequest, "Projeto com ID ${tarefaDTO.projetoId} não encontrado")
+                    return@post
+                }
+
+                val tarefaId = transaction {
+                    Tarefas.insert {
+                        it[titulo] = tarefaDTO.titulo
+                        it[descricao] = tarefaDTO.descricao
+                        it[prioridade] = tarefaDTO.prioridade
+                        it[status] = tarefaDTO.status
+                        it[projetoId] = tarefaDTO.projetoId
+                        it[dataDeConclusao] = tarefaDTO.dataDeConclusao
+                    } get Tarefas.id
+                }
+                call.respondText("Tarefa criada com sucesso! ID: $tarefaId", status = HttpStatusCode.Created)
+            } catch (e: Exception) {
+                println("Erro no POST: ${e.message}") // Log do erro
+                call.respond(HttpStatusCode.BadRequest, "Erro ao processar a requisição.")
             }
-            call.respondText("Tarefa criada com sucesso! ID: $tarefaId", status = HttpStatusCode.Created)
         }
+    }
 
         // Buscar uma tarefa pelo ID
         get("/{id}") {
@@ -118,4 +138,3 @@ fun Route.tarefasRoutes() {
             }
         }
     }
-}
