@@ -16,18 +16,25 @@ fun Route.projetosRoutes() {
 
         //Listar todos os projetos
         get {
-            val projetos = transaction {
-                Projetos.selectAll().map {
-                    mapOf(
-                        "id" to it[Projetos.id],
-                        "nome" to it[Projetos.nome],
-                        "descricao" to it[Projetos.descricao],
-                        "dataDeInicio" to it[Projetos.dataDeInicio]?.toString(),
-                        "dataDeFim" to it[Projetos.dataDeFim]?.toString()
-                    )
+            try {
+                val projetos = transaction {
+                    Projetos.selectAll().map {
+                        mapOf(
+                            "id" to it[Projetos.id],
+                            "nome" to it[Projetos.nome],
+                            "descricao" to it[Projetos.descricao],
+                            "dataDeInicio" to it[Projetos.dataDeInicio]?.toString(),
+                            "dataDeFim" to it[Projetos.dataDeFim]?.toString()
+                        )
+                    }
                 }
+
+                println("Projetos encontrados: $projetos")
+                call.respond(projetos)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao listar os projetos")
             }
-            call.respond(projetos)
         }
 
         //Criar um novo projeto
@@ -35,7 +42,7 @@ fun Route.projetosRoutes() {
             val projetoDTO = call.receive<ProjetosDTO>()
             val projetoID = transaction {
                 Projetos.insert {
-                    it [nome] = projetoDTO.nome
+                    it[nome] = projetoDTO.nome
                     it[descricao] = projetoDTO.descricao
                     it[dataDeInicio] = projetoDTO.dataDeInicio
                     it[dataDeFim] = projetoDTO.dataDeFim

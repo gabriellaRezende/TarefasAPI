@@ -42,7 +42,7 @@ fun Route.tarefasRoutes() {
                 val projetoExiste = transaction {
                     Projetos.select {Projetos.id eq tarefaDTO.projetoId}.count() > 0
                 }
-                if (projetoExiste) {
+                if (!projetoExiste) {
                     call.respond(HttpStatusCode.BadRequest, "Projeto com ID ${tarefaDTO.projetoId} não encontrado")
                     return@post
                 }
