@@ -19,12 +19,12 @@ fun Route.projetosRoutes() {
             try {
                 val projetos = transaction {
                     Projetos.selectAll().map {
-                        mapOf(
-                            "id" to it[Projetos.id],
-                            "nome" to it[Projetos.nome],
-                            "descricao" to it[Projetos.descricao],
-                            "dataDeInicio" to it[Projetos.dataDeInicio]?.toString(),
-                            "dataDeFim" to it[Projetos.dataDeFim]?.toString()
+                        ProjetosDTO(
+                            id = it[Projetos.id],
+                            nome = it[Projetos.nome],
+                            descricao = it[Projetos.descricao]?: "",
+                            dataDeInicio = it[Projetos.dataDeInicio],
+                            dataDeFim = it[Projetos.dataDeFim]
                         )
                     }
                 }

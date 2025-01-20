@@ -6,6 +6,7 @@ import java.time.LocalDate
 
 @Serializable
 data class ProjetosDTO(
+    val id: Int,
     val nome: String,
     val descricao: String,
     @Serializable(with = LocalDateSerializer::class)
