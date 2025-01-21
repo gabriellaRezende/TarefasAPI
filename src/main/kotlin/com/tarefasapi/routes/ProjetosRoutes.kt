@@ -61,18 +61,18 @@ fun Route.projetosRoutes() {
 
             val projetos = transaction {
                 Projetos.select {Projetos.id.eq(id) }.map {
-                    mapOf(
-                        "id" to it[Projetos.id],
-                        "nome" to it[Projetos.nome],
-                        "descricao" to it[Projetos.descricao],
-                        "dataDeInicio" to it[Projetos.dataDeInicio]?.toString(),
-                        "dataDeFim" to it[Projetos.dataDeFim]?.toString(),
+                    ProjetosDTO(
+                        id = it[Projetos.id],
+                        nome= it[Projetos.nome],
+                        descricao = it[Projetos.descricao]?: "",
+                        dataDeInicio = it[Projetos.dataDeInicio],
+                        dataDeFim = it[Projetos.dataDeFim],
                     )
                 }.firstOrNull()
             }
 
             if (projetos == null) {
-                call.respondText("Projeto não encontrado!", status = HttpStatusCode.NotFound)
+                call.respondText("Projeto não existe!", status = HttpStatusCode.NotFound)
             } else {
                 call.respond(projetos)
             }
