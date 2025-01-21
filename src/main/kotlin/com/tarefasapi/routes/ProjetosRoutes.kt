@@ -10,9 +10,6 @@ import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 fun Route.projetosRoutes() {
     route("/projetos") {
@@ -103,28 +100,13 @@ fun Route.projetosRoutes() {
                 return@put
             }
 
-            //Converter data string para LocalDate
-            val dataDeInicioParsed = try {
-                java.sql.Date.valueOf(dataDeInicio, )
-            } catch (e: Exception) {
-                call.respondText("Formato de data inválido para dataDeInicio", status = HttpStatusCode.BadRequest)
-                return@put
-            }
-
-            val dataDeFimParsed = try {
-                java.sql.Date.valueOf(dataDeFim)
-            } catch (e: Exception) {
-                call.respondText("Formato de data inválido para dataDeFim", status = HttpStatusCode.BadRequest)
-                return@put
-            }
-
             //Atualizar o projeto no banco
             val updatedRows = transaction {
                 Projetos.update({ Projetos.id.eq(id) }) {
-                    it[nome] = nome
-                    it[descricao] = descricao // Usando a variável 'descricao' validada
-                    it[dataDeInicio] = dataDeInicioParsed // Usando a variável 'dataDeInicioParsed' convertida para java.sql.Date
-                    it[dataDeFim] = dataDeFimParsed
+                    it [Projetos.nome] = nome
+                    it [Projetos.descricao] = descricao
+                    it [Projetos.dataDeInicio] = dataDeInicio
+                    it [Projetos.dataDeFim] = dataDeFim
                 }
             }
 
