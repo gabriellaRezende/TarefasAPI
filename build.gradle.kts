@@ -3,12 +3,15 @@ plugins {
     kotlin("plugin.serialization") version "2.0.21"
     id("application")
     id("io.ktor.plugin") version "2.3.5" // Plugin para o Ktor
+    id("com.google.gms.google-services") version "4.3.15" apply false
+
 }
 
 group = "com.tarefasapi"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    google()
     mavenCentral()
 }
 
@@ -31,6 +34,11 @@ dependencies {
 
     // Banco de dados (H2)
     implementation("com.h2database:h2:2.2.224") // H2 para testes ou banco embutido
+
+    // Banco de dados Firebase
+    implementation("com.google.firebase:firebase-admin:9.1.1")
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+
 
     // Jackson para JSON
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
