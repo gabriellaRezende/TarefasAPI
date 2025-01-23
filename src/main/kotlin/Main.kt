@@ -16,6 +16,8 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
+
+
 fun startH2Console() {
     try {
         Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start()
