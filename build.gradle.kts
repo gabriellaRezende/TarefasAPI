@@ -40,6 +40,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
 
 
+
+
     // Jackson para JSON
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
 

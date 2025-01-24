@@ -1,9 +1,11 @@
 package com.tarefasapi
 
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
+import com.google.firebase.database.FirebaseDatabase
 import com.tarefasapi.com.tarefasapi.routes.projetosRoutes
 import com.tarefasapi.com.tarefasapi.routes.tarefasRoutes
-import com.tarefasapi.models.Projetos
-import com.tarefasapi.models.Tarefas
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -11,39 +13,42 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
-import org.h2.tools.Server
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
+import java.io.File
 
-
-
-fun startH2Console() {
+fun configureFirebase() {
     try {
-        Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start()
-        println("H2 Console disponível em http://localhost:8082")
+        val serviceAccount = File("src/main/resources/tarefasapi-firebase-adminsdk-fbsvc-de473a0534.json").inputStream()
+
+        val options = FirebaseOptions.builder()
+        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        .setDatabaseUrl("https://tarefasapi-default-rtdb.europe-west1.firebasedatabase.app/")
+        .build()
+
+        FirebaseApp.initializeApp(options)
+        println("Firebase is ready")
     } catch (e: Exception) {
-        println("Error ao iniciar o H2 Console: ${e.message}")
+        println("Error: ${e.localizedMessage}")
+    throw e
+    }
+}
+
+fun testFirebaseConection() {
+    try {
+        val database = FirebaseDatabase.getInstance().reference
+        val testRef = database.child("test")
+
+        testRef.setValueAsync("Conexão funcionando").get()
+        println("Conexão com firebase bem sucedida!!")
+    } catch (e: Exception) {
+        println("Error ao conectar o firebase: ${e.message}")
     }
 }
 
 fun main() {
-    // Conectar ao banco de dados H2
-    Database.connect(
-        url = "jdbc:h2:./data/tarefasDB",
-        driver = "org.h2.Driver",
-        user = "sa",
-        password = ""
-    )
+    // Configurar Firebase
+    configureFirebase()
+    testFirebaseConection()
 
-    // Criar tabelas no banco de dados
-    transaction {
-        SchemaUtils.create(Projetos, Tarefas)
-    }
-
-    println("Banco de dados H2 configurado e tabelas criadas!")
-
-    startH2Console()
 
     // Iniciar o servidor Ktor
     embeddedServer(Netty, port = 8080) {
